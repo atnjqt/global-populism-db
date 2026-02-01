@@ -6,7 +6,7 @@
 
 This repository aims to provide tools for researchers interested in the **Global Populism Database provided by Harvard Dataverse** (see [here](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LFTQEZ)).
 
-![alt text](image.png)
+![image of the web UI](assets/image.png)
 
 The database contains information on populist speeches from various countries around the world. Goals include:
 
