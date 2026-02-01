@@ -1,5 +1,9 @@
+# data files
+dataverse_files/
+
 # Python virtual environment
 venv/
+.venv/
 env/
 ENV/
 *.pyc
