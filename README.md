@@ -1,6 +1,6 @@
 # Global Populism Database
 
-- Etienne P Jacquot (01/31/2026)
+- Etienne P Jacquot (01/31/2026) [etiennej@upenn.edu](mailto:etiennej@upenn.edu)
 
 ## Overview
 
