@@ -10,10 +10,10 @@ This repository aims to provide tools for researchers interested in the **Global
 
 The database contains information on populist speeches from various countries around the world. Goals include:
 
-- Using LLMs and embedding models on textual data
-- Using agentic AI workflows (chain of thought, tools, etc) to explore the dataset
-- Using an interactive geographic visualization to explore populism trends
-- Providing reproducible code examples for researchers
+- [ ] Using LLMs and embedding models on textual data
+- [ ] Using agentic AI workflows (chain of thought, tools, etc) to explore the dataset
+- [x] Using an interactive geographic visualization to explore populism trends
+- [ ] Providing reproducible code examples for researchers
 
 ## Features
 
