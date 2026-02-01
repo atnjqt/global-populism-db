@@ -58,6 +58,54 @@
             margin: 0;
         }
 
+        .navigation {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0;
+        }
+
+        .nav-tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            position: relative;
+        }
+
+        .nav-tab:hover {
+            color: #e63946;
+            background: #f8f9fa;
+        }
+
+        .nav-tab.active {
+            color: #e63946;
+            border-bottom-color: #e63946;
+            background: #fff;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -352,6 +400,241 @@
             color: #666;
         }
 
+        /* Rankings Table Styles */
+        .rankings-controls {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .rankings-table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .rankings-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .rankings-table thead {
+            background: linear-gradient(135deg, #ff6b35 0%, #e63946 100%);
+            color: white;
+        }
+
+        .rankings-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .rankings-table th:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .rankings-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .rankings-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #333; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e8e8e8); color: #333; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #e8a87c); color: white; }
+        .rank-other { background: #e0e0e0; color: #666; }
+
+        .score-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .ideology-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .ideology-left { background: #e3f2fd; color: #1976d2; }
+        .ideology-center { background: #f3e5f5; color: #7b1fa2; }
+        .ideology-right { background: #fce4ec; color: #c2185b; }
+
+        .ideology-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .ideology-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ideology-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .ideology-checkbox label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #e63946;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .legend-multi {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .legend-section {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        .legend-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .legend-section h4 {
+            margin: 0 0 0.75rem 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* About Page Styles */
+        .about-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .about-content h2 {
+            color: #e63946;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-content h3 {
+            color: #ff6b35;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .about-content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .about-content a {
+            color: #e63946;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .about-content a:hover {
+            text-decoration: underline;
+        }
+
+        .citation-box {
+            background: #f8f9fa;
+            border-left: 4px solid #ff6b35;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
         @media (max-width: 768px) {
             .controls-grid {
                 grid-template-columns: 1fr;
@@ -402,6 +685,16 @@
         </div>
     </div>
 
+    <div class="navigation">
+        <div class="nav-container">
+            <button class="nav-tab active" onclick="switchPage('map')">🗺️ Interactive Map</button>
+            <button class="nav-tab" onclick="switchPage('rankings')">🏆 Rankings</button>
+            <button class="nav-tab" onclick="switchPage('about')">ℹ️ About</button>
+        </div>
+    </div>
+
+    <!-- MAP PAGE -->
+    <div id="map-page" class="page-section active">
     <div class="container">
         <div class="controls">
             <div class="controls-grid">
@@ -422,6 +715,43 @@
                         <option value="international">International Speeches</option>
                         <option value="ribbon">Ribbon-Cutting Speeches</option>
                     </select>
+                </div>
+                <div class="control-group">
+                    <label>Ideology Filter</label>
+                    <div class="ideology-filters">
+                        <div class="ideology-checkbox">
+                            <input type="checkbox" id="mapFilterLeft" checked>
+                            <label for="mapFilterLeft">Left</label>
+                        </div>
+                        <div class="ideology-checkbox">
+                            <input type="checkbox" id="mapFilterCenter" checked>
+                            <label for="mapFilterCenter">Center</label>
+                        </div>
+                        <div class="ideology-checkbox">
+                            <input type="checkbox" id="mapFilterRight" checked>
+                            <label for="mapFilterRight">Right</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Color by Ideology</label>
+                    <div class="toggle-label">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="colorByIdeology" onchange="updateColorMode()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span id="toggleLabel" style="font-size: 0.85rem; color: #666;">Off</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Relative Colors</label>
+                    <div class="toggle-label">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="relativeColors" onchange="updateColorMode()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span id="relativeLabel" style="font-size: 0.85rem; color: #666;">Off</span>
+                    </div>
                 </div>
                 <div class="control-group">
                     <label>&nbsp;</label>
@@ -513,6 +843,166 @@
             </div>
         </div>
     </div>
+    </div>
+    <!-- END MAP PAGE -->
+
+    <!-- RANKINGS PAGE -->
+    <div id="rankings-page" class="page-section">
+    <div class="container">
+        <div class="rankings-controls">
+            <div class="control-group">
+                <label for="rankSort">Sort By</label>
+                <select id="rankSort">
+                    <option value="total">Total Average</option>
+                    <option value="campaign">Campaign Speeches</option>
+                    <option value="famous">Famous Speeches</option>
+                    <option value="international">International Speeches</option>
+                    <option value="ribbon">Ribbon-Cutting Speeches</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="rankYearStart">Start Year</label>
+                <input type="number" id="rankYearStart" min="1934" max="2026" placeholder="All">
+            </div>
+            <div class="control-group">
+                <label for="rankYearEnd">End Year</label>
+                <input type="number" id="rankYearEnd" min="1934" max="2026" placeholder="All">
+            </div>
+            <div class="control-group">
+                <label for="rankLimit">Show Top</label>
+                <select id="rankLimit">
+                    <option value="">All</option>
+                    <option value="10">Top 10</option>
+                    <option value="25">Top 25</option>
+                    <option value="50">Top 50</option>
+                    <option value="100">Top 100</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Ideology Filter</label>
+                <div class="ideology-filters">
+                    <div class="ideology-checkbox">
+                        <input type="checkbox" id="filterLeft" checked>
+                        <label for="filterLeft">Left (-1)</label>
+                    </div>
+                    <div class="ideology-checkbox">
+                        <input type="checkbox" id="filterCenter" checked>
+                        <label for="filterCenter">Center (0)</label>
+                    </div>
+                    <div class="ideology-checkbox">
+                        <input type="checkbox" id="filterRight" checked>
+                        <label for="filterRight">Right (1)</label>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>&nbsp;</label>
+                <button class="update-btn" onclick="loadRankings()">Update Rankings</button>
+            </div>
+        </div>
+
+        <div class="rankings-table-container">
+            <table class="rankings-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Leader</th>
+                        <th>Country</th>
+                        <th>Party</th>
+                        <th>Term</th>
+                        <th>Ideology</th>
+                        <th>Region</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingsBody">
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 2rem; color: #666;">
+                            Click "Update Rankings" to load data
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+    <!-- END RANKINGS PAGE -->
+
+    <!-- ABOUT PAGE -->
+    <div id="about-page" class="page-section">
+    <div class="container">
+        <div class="about-content">
+            <h1 style="color: #e63946; margin-bottom: 1rem;">About This Project</h1>
+            
+            <p><strong>This is a demonstration application</strong> built to showcase interactive exploration of the <strong>Global Populism Database</strong> provided by Harvard Dataverse.</p>
+
+            <h2>The Global Populism Database</h2>
+            <p>The Global Populism Database (GPD) is a comprehensive dataset tracking populist rhetoric in speeches by world leaders across time and geography. The database was created by researchers and made publicly available through Harvard Dataverse.</p>
+
+            <div class="citation-box">
+                <strong>Data Source:</strong><br>
+                Global Populism Database (GPD) v2.1<br>
+                Harvard Dataverse<br>
+                DOI: <a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LFTQEZ" target="_blank">10.7910/DVN/LFTQEZ</a>
+            </div>
+
+            <h3>Dataset Coverage</h3>
+            <ul>
+                <li><strong>77 countries</strong> across all world regions</li>
+                <li><strong>269 leaders</strong> and 361 distinct terms in office</li>
+                <li><strong>Time span:</strong> 1934 to present</li>
+                <li><strong>Speech types:</strong> Campaign, Famous, International, and Ribbon-cutting speeches</li>
+            </ul>
+
+            <h3>Populism Scoring</h3>
+            <p>Leaders are scored on a scale from <strong>0 to 2</strong>:</p>
+            <ul>
+                <li><strong>0:</strong> No populist rhetoric detected</li>
+                <li><strong>1:</strong> Moderate populist rhetoric</li>
+                <li><strong>2:</strong> Strong populist rhetoric</li>
+            </ul>
+            <p>Scores are calculated based on content analysis of speeches, examining themes like anti-elitism, people-centrism, and Manichean discourse.</p>
+
+            <h2>About This Demonstration</h2>
+            <p>This interactive web application was created to demonstrate modern approaches to working with political science datasets, including:</p>
+            <ul>
+                <li><strong>Geographic Visualization:</strong> Heat maps showing populism intensity by country</li>
+                <li><strong>Temporal Analysis:</strong> Filtering and exploring trends across time periods</li>
+                <li><strong>Comparative Rankings:</strong> Identifying and comparing most populist leaders</li>
+                <li><strong>API Access:</strong> RESTful API for programmatic data access</li>
+            </ul>
+
+            <h3>Technology Stack</h3>
+            <ul>
+                <li><strong>Backend:</strong> FastAPI (Python) with Pandas for data processing</li>
+                <li><strong>Frontend:</strong> Vanilla JavaScript with Leaflet.js for mapping</li>
+                <li><strong>Data:</strong> CSV dataset from Harvard Dataverse</li>
+            </ul>
+
+            <h3>Future Enhancements</h3>
+            <p>Potential extensions of this demonstration could include:</p>
+            <ul>
+                <li>LLM-powered analysis of speech transcripts</li>
+                <li>Embedding-based similarity search across speeches</li>
+                <li>Temporal trend visualization with charts</li>
+                <li>Correlation analysis with political and economic indicators</li>
+                <li>Export functionality for filtered datasets</li>
+            </ul>
+
+            <h2>How to Cite</h2>
+            <p>If you use the Global Populism Database in your research, please cite the original dataset creators. Full citation information is available on the Harvard Dataverse page.</p>
+
+            <h2>Disclaimer</h2>
+            <p>This is an independent demonstration project for educational and research purposes. It is not affiliated with or endorsed by Harvard University or the original dataset creators.</p>
+
+            <p style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee; color: #666;">
+                <strong>Created:</strong> January 2026<br>
+                <strong>Purpose:</strong> Research demonstration and data exploration tool
+            </p>
+        </div>
+    </div>
+    </div>
+    <!-- END ABOUT PAGE -->
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -520,6 +1010,32 @@
         let map;
         let currentData = [];
         let markers = [];
+
+        // Page switching
+        function switchPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(`${pageName}-page`).classList.add('active');
+            
+            // Activate selected tab
+            event.target.classList.add('active');
+            
+            // Initialize map if switching to map page
+            if (pageName === 'map' && !map) {
+                initMap();
+                loadSummary();
+                updateMap();
+            }
+        }
 
         // Country coordinates (approximate centers)
         const countryCoords = {
@@ -560,10 +1076,118 @@
         }
 
         // Get color for populism score
-        function getColor(score) {
-            const colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026'];
-            const index = Math.min(Math.floor(score * 4), colors.length - 1);
-            return colors[index];
+        function getColor(score, ideology = null, scoreRange = null) {
+            const colorByIdeology = document.getElementById('colorByIdeology')?.checked;
+            const useRelative = document.getElementById('relativeColors')?.checked;
+            
+            // If using relative colors and we have a score range, normalize the score
+            let normalizedScore = score;
+            if (useRelative && scoreRange && scoreRange.max > scoreRange.min) {
+                normalizedScore = (score - scoreRange.min) / (scoreRange.max - scoreRange.min) * 2;
+            }
+            
+            if (colorByIdeology && ideology !== null) {
+                // Different color schemes by ideology
+                if (ideology === -1) {
+                    // Left: light blue to dark blue/purple
+                    const colors = ['#e3f2fd', '#bbdefb', '#90caf9', '#64b5f6', '#42a5f5', '#2196f3', '#1976d2', '#1565c0', '#0d47a1'];
+                    const index = Math.min(Math.floor(normalizedScore * 4), colors.length - 1);
+                    return colors[index];
+                } else if (ideology === 0) {
+                    // Center: light green to dark green
+                    const colors = ['#e8f5e9', '#c8e6c9', '#a5d6a7', '#81c784', '#66bb6a', '#4caf50', '#43a047', '#388e3c', '#2e7d32'];
+                    const index = Math.min(Math.floor(normalizedScore * 4), colors.length - 1);
+                    return colors[index];
+                } else {
+                    // Right: yellow-orange-red (default)
+                    const colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026'];
+                    const index = Math.min(Math.floor(normalizedScore * 4), colors.length - 1);
+                    return colors[index];
+                }
+            } else {
+                // Default: yellow-orange-red for all
+                const colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026'];
+                const index = Math.min(Math.floor(normalizedScore * 4), colors.length - 1);
+                return colors[index];
+            }
+        }
+
+        // Update color mode toggle label
+        function updateColorMode() {
+            const toggle = document.getElementById('colorByIdeology');
+            const label = document.getElementById('toggleLabel');
+            label.textContent = toggle.checked ? 'On' : 'Off';
+            
+            const relativeToggle = document.getElementById('relativeColors');
+            const relativeLabel = document.getElementById('relativeLabel');
+            relativeLabel.textContent = relativeToggle.checked ? 'On' : 'Off';
+            
+            updateLegend();
+            updateMap();
+        }
+
+        // Update legend based on color mode
+        function updateLegend() {
+            const colorByIdeology = document.getElementById('colorByIdeology').checked;
+            const useRelative = document.getElementById('relativeColors').checked;
+            const legendDiv = document.querySelector('.legend');
+            
+            const relativeNote = useRelative ? '<p style="font-size: 0.75rem; color: #666; margin-top: 0.5rem; font-style: italic;">Colors scaled relative to filtered data</p>' : '';
+            
+            if (colorByIdeology) {
+                legendDiv.innerHTML = `
+                    <h3>Populism Score by Ideology</h3>
+                    ${relativeNote}
+                    <div class="legend-multi">
+                        <div class="legend-section">
+                            <h4>Left (-1)</h4>
+                            <div class="legend-scale">
+                                <div class="legend-item"><div class="legend-color" style="background: #e3f2fd;"></div><div class="legend-label">0.0 - 0.2</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #90caf9;"></div><div class="legend-label">0.4 - 0.6</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #42a5f5;"></div><div class="legend-label">0.8 - 1.0</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #1976d2;"></div><div class="legend-label">1.2 - 1.5</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #0d47a1;"></div><div class="legend-label">1.8 - 2.0</div></div>
+                            </div>
+                        </div>
+                        <div class="legend-section">
+                            <h4>Center (0)</h4>
+                            <div class="legend-scale">
+                                <div class="legend-item"><div class="legend-color" style="background: #e8f5e9;"></div><div class="legend-label">0.0 - 0.2</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #a5d6a7;"></div><div class="legend-label">0.4 - 0.6</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #66bb6a;"></div><div class="legend-label">0.8 - 1.0</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #43a047;"></div><div class="legend-label">1.2 - 1.5</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #2e7d32;"></div><div class="legend-label">1.8 - 2.0</div></div>
+                            </div>
+                        </div>
+                        <div class="legend-section">
+                            <h4>Right (1)</h4>
+                            <div class="legend-scale">
+                                <div class="legend-item"><div class="legend-color" style="background: #ffffcc;"></div><div class="legend-label">0.0 - 0.2</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #fed976;"></div><div class="legend-label">0.4 - 0.6</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #fd8d3c;"></div><div class="legend-label">0.8 - 1.0</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #e31a1c;"></div><div class="legend-label">1.2 - 1.5</div></div>
+                                <div class="legend-item"><div class="legend-color" style="background: #800026;"></div><div class="legend-label">1.8 - 2.0</div></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                legendDiv.innerHTML = `
+                    <h3>Populism Score Scale</h3>
+                    ${relativeNote}
+                    <div class="legend-scale">
+                        <div class="legend-item"><div class="legend-color" style="background: #ffffcc;"></div><div class="legend-label">0.0 - 0.2 (Very Low)</div></div>
+                        <div class="legend-item"><div class="legend-color" style="background: #ffeda0;"></div><div class="legend-label">0.2 - 0.4</div></div>
+                        <div class="legend-item"><div class="legend-color" style="background: #fed976;"></div><div class="legend-label">0.4 - 0.6</div></div>
+                        <div class="legend-item"><div class="legend-color" style="background: #feb24c;"></div><div class="legend-label">0.6 - 0.8</div></div>
+                        <div class="legend-item"><div class="legend-color" style="background: #fd8d3c;"></div><div class="legend-label">0.8 - 1.0</div></div>
+                        <div class="legend-item"><div class="legend-color" style="background: #fc4e2a;"></div><div class="legend-label">1.0 - 1.2</div></div>
+                        <div class="legend-item"><div class="legend-color" style="background: #e31a1c;"></div><div class="legend-label">1.2 - 1.5</div></div>
+                        <div class="legend-item"><div class="legend-color" style="background: #bd0026;"></div><div class="legend-label">1.5 - 1.8</div></div>
+                        <div class="legend-item"><div class="legend-color" style="background: #800026;"></div><div class="legend-label">1.8 - 2.0 (Very High)</div></div>
+                    </div>
+                `;
+            }
         }
 
         // Update map with data
@@ -572,12 +1196,30 @@
             markers.forEach(marker => map.removeLayer(marker));
             markers = [];
 
+            // Calculate score ranges per ideology for relative coloring
+            const useRelative = document.getElementById('relativeColors')?.checked;
+            const scoreRanges = {};
+            
+            if (useRelative) {
+                [-1, 0, 1].forEach(ideology => {
+                    const ideologyData = data.filter(d => d.ideology === ideology);
+                    if (ideologyData.length > 0) {
+                        const scores = ideologyData.map(d => d.avg_populism);
+                        scoreRanges[ideology] = {
+                            min: Math.min(...scores),
+                            max: Math.max(...scores)
+                        };
+                    }
+                });
+            }
+
             // Add new markers
             data.forEach(item => {
                 const coords = countryCoords[item.country];
                 if (!coords) return;
 
-                const color = getColor(item.avg_populism);
+                const scoreRange = useRelative ? scoreRanges[item.ideology] : null;
+                const color = getColor(item.avg_populism, item.ideology, scoreRange);
                 const radius = Math.max(5, Math.min(20, 5 + item.avg_populism * 10));
 
                 const marker = L.circleMarker(coords, {
@@ -589,10 +1231,13 @@
                     fillOpacity: 0.8
                 });
 
+                const ideologyLabel = item.ideology === -1 ? 'Left' : (item.ideology === 0 ? 'Center' : 'Right');
+
                 marker.bindPopup(`
                     <strong>${item.country}</strong><br>
                     Avg Populism: ${item.avg_populism.toFixed(2)}<br>
                     Region: ${item.region}<br>
+                    Ideology: ${ideologyLabel}<br>
                     Leader Terms: ${item.num_terms}
                 `);
 
@@ -666,6 +1311,11 @@
             const yearStart = document.getElementById('yearStart').value;
             const yearEnd = document.getElementById('yearEnd').value;
             const speechType = document.getElementById('speechType').value;
+            
+            // Get ideology filters
+            const leftChecked = document.getElementById('mapFilterLeft').checked;
+            const centerChecked = document.getElementById('mapFilterCenter').checked;
+            const rightChecked = document.getElementById('mapFilterRight').checked;
 
             // Add loading state
             btn.classList.add('loading');
@@ -681,11 +1331,24 @@
                 const response = await fetch(`${API_BASE}/api/map-data?${params}`);
                 const data = await response.json();
 
-                currentData = data.map_data;
+                // Filter by ideology checkboxes
+                let filteredData = data.map_data;
+                if (!leftChecked || !centerChecked || !rightChecked) {
+                    filteredData = filteredData.filter(item => {
+                        if (item.ideology === -1 && leftChecked) return true;
+                        if (item.ideology === 0 && centerChecked) return true;
+                        if (item.ideology === 1 && rightChecked) return true;
+                        return false;
+                    });
+                }
+
+                currentData = filteredData;
                 updateMapMarkers(currentData);
 
                 // Update stats
-                const avgPopulism = currentData.reduce((sum, d) => sum + d.avg_populism, 0) / currentData.length;
+                const avgPopulism = currentData.length > 0 
+                    ? currentData.reduce((sum, d) => sum + d.avg_populism, 0) / currentData.length 
+                    : 0;
                 document.getElementById('statCountries').textContent = currentData.length;
                 document.getElementById('statAvgPopulism').textContent = avgPopulism.toFixed(2);
 
@@ -713,10 +1376,85 @@
             }
         }
 
+        // Load rankings
+        async function loadRankings() {
+            const sortBy = document.getElementById('rankSort').value;
+            const yearStart = document.getElementById('rankYearStart').value;
+            const yearEnd = document.getElementById('rankYearEnd').value;
+            const limit = document.getElementById('rankLimit').value;
+            
+            // Collect ideology filters
+            const ideologies = [];
+            if (document.getElementById('filterLeft').checked) ideologies.push('-1');
+            if (document.getElementById('filterCenter').checked) ideologies.push('0');
+            if (document.getElementById('filterRight').checked) ideologies.push('1');
+
+            try {
+                const params = new URLSearchParams({ sort_by: sortBy });
+                if (yearStart) params.append('year_start', yearStart);
+                if (yearEnd) params.append('year_end', yearEnd);
+                if (limit) params.append('limit', limit);
+                if (ideologies.length > 0 && ideologies.length < 3) {
+                    params.append('ideology', ideologies.join(','));
+                }
+
+                const response = await fetch(`${API_BASE}/api/rankings?${params}`);
+                const data = await response.json();
+
+                displayRankings(data.rankings);
+
+            } catch (error) {
+                console.error('Error loading rankings:', error);
+                alert('Error loading rankings. Please check the console for details.');
+            }
+        }
+
+        // Display rankings in table
+        function displayRankings(rankings) {
+            const tbody = document.getElementById('rankingsBody');
+            
+            if (rankings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #666;">No results found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = rankings.map(r => {
+                const rankClass = r.rank === 1 ? 'rank-1' : r.rank === 2 ? 'rank-2' : r.rank === 3 ? 'rank-3' : 'rank-other';
+                const scoreColor = getColor(r.primary_score);
+                
+                let ideologyBadge = '';
+                if (r.lr === -1) {
+                    ideologyBadge = '<span class="ideology-badge ideology-left">Left</span>';
+                } else if (r.lr === 0) {
+                    ideologyBadge = '<span class="ideology-badge ideology-center">Center</span>';
+                } else if (r.lr === 1) {
+                    ideologyBadge = '<span class="ideology-badge ideology-right">Right</span>';
+                }
+
+                return `
+                    <tr>
+                        <td><div class="rank-badge ${rankClass}">${r.rank}</div></td>
+                        <td><strong>${r.leader}</strong></td>
+                        <td>${r.country}</td>
+                        <td>${r.party || '-'}</td>
+                        <td>${r.year_start} - ${r.year_end} (Term ${r.term})</td>
+                        <td>${ideologyBadge}</td>
+                        <td>${r.region || '-'}</td>
+                        <td>
+                            <span class="score-badge" style="background: ${scoreColor}; color: ${r.primary_score > 0.8 ? 'white' : '#333'};">
+                                ${r.primary_score.toFixed(2)}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
         // Initialize
         window.onload = () => {
             initMap();
             loadSummary();
+            updateLegend(); // Initialize legend
             updateMap();
         };
     </script>

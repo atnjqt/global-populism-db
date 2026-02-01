@@ -231,10 +231,11 @@ async def get_map_data(
         score_column: 'mean',
         'region': 'first',
         'wb_region': 'first',
+        'lr': lambda x: x.mode()[0] if len(x.mode()) > 0 else x.iloc[0],  # Most common ideology
         'leader': 'count'  # Count number of leader terms
     }).reset_index()
     
-    country_data.columns = ['country', 'avg_populism', 'region', 'wb_region', 'num_terms']
+    country_data.columns = ['country', 'avg_populism', 'region', 'wb_region', 'ideology', 'num_terms']
     
     # Convert to list of dicts
     map_data = []
@@ -244,6 +245,7 @@ async def get_map_data(
             "avg_populism": float(row['avg_populism']) if pd.notna(row['avg_populism']) else 0,
             "region": row['region'] if pd.notna(row['region']) else "Unknown",
             "wb_region": row['wb_region'] if pd.notna(row['wb_region']) else "Unknown",
+            "ideology": int(row['ideology']) if pd.notna(row['ideology']) else 0,
             "num_terms": int(row['num_terms'])
         })
     
@@ -253,6 +255,95 @@ async def get_map_data(
             "year_start": year_start,
             "year_end": year_end,
             "speech_type": speech_type
+        }
+    }
+
+
+@app.get("/api/rankings")
+async def get_rankings(
+    sort_by: Optional[str] = "total",
+    limit: Optional[int] = None,
+    year_start: Optional[int] = None,
+    year_end: Optional[int] = None,
+    ideology: Optional[str] = None
+):
+    """
+    Get ranked list of leader terms by populism scores
+    ideology: comma-separated list of values (-1, 0, 1) or None for all
+    """
+    if df is None:
+        raise HTTPException(status_code=500, detail="Data not loaded")
+    
+    filtered_df = df.copy()
+    
+    # Filter by year range - include terms that overlap with the selected period
+    if year_start and year_end:
+        filtered_df = filtered_df[
+            (filtered_df['yearbegin'] <= year_end) & 
+            (filtered_df['yearend_numeric'] >= year_start)
+        ]
+    elif year_start:
+        filtered_df = filtered_df[filtered_df['yearend_numeric'] >= year_start]
+    elif year_end:
+        filtered_df = filtered_df[filtered_df['yearbegin'] <= year_end]
+    
+    # Filter by ideology
+    if ideology:
+        ideology_values = [int(x.strip()) for x in ideology.split(',')]
+        filtered_df = filtered_df[filtered_df['lr'].isin(ideology_values)]
+    
+    # Select the appropriate score column
+    score_column_map = {
+        "total": "totalaverage",
+        "campaign": "campaign_average",
+        "famous": "famous_average",
+        "international": "international_average",
+        "ribbon": "ribbon_average"
+    }
+    
+    score_column = score_column_map.get(sort_by, "totalaverage")
+    
+    # Sort by score (descending)
+    sorted_df = filtered_df.sort_values(score_column, ascending=False)
+    
+    # Apply limit if specified
+    if limit:
+        sorted_df = sorted_df.head(limit)
+    
+    # Build rankings
+    rankings = []
+    for idx, (_, row) in enumerate(sorted_df.iterrows(), 1):
+        score = row[score_column]
+        if pd.isna(score):
+            continue
+            
+        rankings.append({
+            "rank": idx,
+            "country": row['country'],
+            "leader": row['leader'],
+            "party": row['party'] if pd.notna(row['party']) else None,
+            "year_start": int(row['yearbegin']),
+            "year_end": row['yearend'] if row['yearend'] != 'current' else 2026,
+            "term": int(row['term']),
+            "lr": row['lr'] if pd.notna(row['lr']) else None,
+            "region": row['region'] if pd.notna(row['region']) else None,
+            "total_score": float(row['totalaverage']) if pd.notna(row['totalaverage']) else None,
+            "campaign_score": float(row['campaign_average']) if pd.notna(row['campaign_average']) else None,
+            "famous_score": float(row['famous_average']) if pd.notna(row['famous_average']) else None,
+            "international_score": float(row['international_average']) if pd.notna(row['international_average']) else None,
+            "ribbon_score": float(row['ribbon_average']) if pd.notna(row['ribbon_average']) else None,
+            "primary_score": float(score)
+        })
+    
+    return {
+        "rankings": rankings,
+        "count": len(rankings),
+        "sort_by": sort_by,
+        "filters": {
+            "year_start": year_start,
+            "year_end": year_end,
+            "limit": limit,
+            "ideology": ideology
         }
     }
 
