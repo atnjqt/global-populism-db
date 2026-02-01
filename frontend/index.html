@@ -754,6 +754,19 @@
                     </div>
                 </div>
                 <div class="control-group">
+                    <label>
+                        Time-Weighted 
+                        <span class="info-icon" title="Weight each leader's score by the proportion of years their term overlaps with the selected timeframe">ⓘ</span>
+                    </label>
+                    <div class="toggle-label">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="timeWeighted" onchange="updateMap()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span id="timeWeightedLabel" style="font-size: 0.85rem; color: #666;">Off</span>
+                    </div>
+                </div>
+                <div class="control-group">
                     <label>&nbsp;</label>
                     <button id="updateBtn" class="update-btn" onclick="updateMap()">
                         Update Map
@@ -1130,9 +1143,14 @@
         function updateLegend() {
             const colorByIdeology = document.getElementById('colorByIdeology').checked;
             const useRelative = document.getElementById('relativeColors').checked;
+            const timeWeighted = document.getElementById('timeWeighted')?.checked;
             const legendDiv = document.querySelector('.legend');
             
-            const relativeNote = useRelative ? '<p style="font-size: 0.75rem; color: #666; margin-top: 0.5rem; font-style: italic;">Colors scaled relative to filtered data</p>' : '';
+            let notes = [];
+            if (useRelative) notes.push('Colors scaled relative to filtered data');
+            if (timeWeighted) notes.push('Scores weighted by overlap years');
+            const notesHTML = notes.length > 0 ? '<p style="font-size: 0.75rem; color: #666; margin-top: 0.5rem; font-style: italic;">' + notes.join(' • ') + '</p>' : '';
+            const relativeNote = notesHTML;
             
             if (colorByIdeology) {
                 legendDiv.innerHTML = `
@@ -1311,11 +1329,15 @@
             const yearStart = document.getElementById('yearStart').value;
             const yearEnd = document.getElementById('yearEnd').value;
             const speechType = document.getElementById('speechType').value;
+            const timeWeighted = document.getElementById('timeWeighted').checked;
             
             // Get ideology filters
             const leftChecked = document.getElementById('mapFilterLeft').checked;
             const centerChecked = document.getElementById('mapFilterCenter').checked;
             const rightChecked = document.getElementById('mapFilterRight').checked;
+            
+            // Update time-weighted toggle label
+            document.getElementById('timeWeightedLabel').textContent = timeWeighted ? 'On' : 'Off';
 
             // Add loading state
             btn.classList.add('loading');
@@ -1323,13 +1345,23 @@
 
             try {
                 const params = new URLSearchParams({
-                    speech_type: speechType
+                    speech_type: speechType,
+                    time_weighted: timeWeighted
                 });
                 if (yearStart) params.append('year_start', yearStart);
                 if (yearEnd) params.append('year_end', yearEnd);
 
+                console.log('Fetching map data with params:', {
+                    speech_type: speechType,
+                    time_weighted: timeWeighted,
+                    year_start: yearStart,
+                    year_end: yearEnd
+                });
+
                 const response = await fetch(`${API_BASE}/api/map-data?${params}`);
                 const data = await response.json();
+                
+                console.log('Received data:', data);
 
                 // Filter by ideology checkboxes
                 let filteredData = data.map_data;
