@@ -103,6 +103,44 @@ export interface TimelineResponse {
   count: number;
 }
 
+export interface SpeechItem {
+  filename: string;
+  country: string;
+  leader: string;
+  party: string | null;
+  ideology: number | null;
+  ideology_label: string;
+  speech_type: string;
+  populism_score: number;
+  year_start: number;
+  year_end: number | string;
+  term: number;
+}
+
+export interface SpeechesResponse {
+  speeches: SpeechItem[];
+  count: number;
+  filters: {
+    country?: string;
+    ideology?: number;
+    speech_type?: string;
+  };
+}
+
+export interface SpeechContentResponse {
+  filename: string;
+  content: string;
+  word_count: number;
+}
+
+export interface SpeechAnalysisResponse {
+  filename: string;
+  summary: string;
+  populism_assessment: string;
+  analyzed_words: number;
+  total_words: number;
+}
+
 export type SpeechType = 'total' | 'campaign' | 'famous' | 'international' | 'ribbon';
 
 export type Ideology = -1 | 0 | 1;  // -1=Left, 0=Center, 1=Right

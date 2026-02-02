@@ -4,10 +4,11 @@ import MapView from '@/components/MapView';
 import Sidebar from '@/components/Sidebar';
 import CountryPanel from '@/components/CountryPanel';
 import About from '@/components/About';
+import Speeches from '@/components/Speeches';
 import { useSummary, useMapData } from '@/hooks/useApi';
 import type { SpeechType, Ideology } from '@/types';
 
-type TabType = 'map' | 'rankings' | 'about';
+type TabType = 'map' | 'speeches' | 'about';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('map');
@@ -33,6 +34,8 @@ function App() {
       <main className="flex-1 max-w-[1400px] max-h-[90vh] mx-auto px-4 pb-4 w-full overflow-hidden">
         {activeTab === 'about' ? (
           <About />
+        ) : activeTab === 'speeches' ? (
+          <Speeches />
         ) : (
           /* Main Layout */
           <div className="grid grid-cols-[240px_1fr_220px] gap-3 h-full">

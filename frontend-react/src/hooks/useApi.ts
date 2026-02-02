@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { fetchSummary, fetchCountries, fetchData, fetchMapData, fetchTimeline } from '@/api';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { fetchSummary, fetchCountries, fetchData, fetchMapData, fetchTimeline, fetchSpeeches, fetchSpeechContent, analyzeSpeech } from '@/api';
 import type { SpeechType } from '@/types';
 
 export function useSummary() {
@@ -47,5 +47,30 @@ export function useTimeline(country: string | null) {
     queryKey: ['timeline', country],
     queryFn: () => fetchTimeline(country!),
     enabled: !!country,
+  });
+}
+
+export function useSpeeches(params?: {
+  country?: string;
+  ideology?: number;
+  speech_type?: string;
+}) {
+  return useQuery({
+    queryKey: ['speeches', params],
+    queryFn: () => fetchSpeeches(params),
+  });
+}
+
+export function useSpeechContent(filename: string | null) {
+  return useQuery({
+    queryKey: ['speech-content', filename],
+    queryFn: () => fetchSpeechContent(filename!),
+    enabled: !!filename,
+  });
+}
+
+export function useAnalyzeSpeech() {
+  return useMutation({
+    mutationFn: (filename: string) => analyzeSpeech(filename),
   });
 }

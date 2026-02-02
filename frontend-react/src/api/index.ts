@@ -4,7 +4,10 @@ import type {
   SummaryResponse, 
   MapDataItem,
   TimelineResponse,
-  SpeechType 
+  SpeechType,
+  SpeechesResponse,
+  SpeechContentResponse,
+  SpeechAnalysisResponse
 } from '@/types';
 
 const API_BASE = '/api';
@@ -65,5 +68,36 @@ export async function fetchMapData(params?: {
 export async function fetchTimeline(country: string): Promise<TimelineResponse> {
   const response = await fetch(`${API_BASE}/timeline/${encodeURIComponent(country)}`);
   if (!response.ok) throw new Error('Failed to fetch timeline');
+  return response.json();
+}
+
+export async function fetchSpeeches(params?: {
+  country?: string;
+  ideology?: number;
+  speech_type?: string;
+}): Promise<SpeechesResponse> {
+  const searchParams = new URLSearchParams();
+  if (params?.country) searchParams.set('country', params.country);
+  if (params?.ideology !== undefined) searchParams.set('ideology', params.ideology.toString());
+  if (params?.speech_type && params.speech_type !== 'total') {
+    searchParams.set('speech_type', params.speech_type);
+  }
+
+  const response = await fetch(`${API_BASE}/speeches?${searchParams}`);
+  if (!response.ok) throw new Error('Failed to fetch speeches');
+  return response.json();
+}
+
+export async function fetchSpeechContent(filename: string): Promise<SpeechContentResponse> {
+  const response = await fetch(`${API_BASE}/speeches/${encodeURIComponent(filename)}`);
+  if (!response.ok) throw new Error('Failed to fetch speech content');
+  return response.json();
+}
+
+export async function analyzeSpeech(filename: string): Promise<SpeechAnalysisResponse> {
+  const response = await fetch(`${API_BASE}/speeches/${encodeURIComponent(filename)}/analyze`, {
+    method: 'POST',
+  });
+  if (!response.ok) throw new Error('Failed to analyze speech');
   return response.json();
 }

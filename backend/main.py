@@ -1,7 +1,7 @@
 """
 FastAPI backend for Global Populism Database visualization
 """
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -9,6 +9,10 @@ import pandas as pd
 import json
 from typing import Optional, List
 from pathlib import Path
+import boto3
+from langchain_aws import ChatBedrock
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 app = FastAPI(title="Global Populism Database API", version="1.0.0")
 
@@ -24,12 +28,13 @@ app.add_middleware(
 # Load data
 DATA_PATH = Path(__file__).parent.parent / "dataverse_files" / "GPD_v2.1_20251120_Wide.csv"
 df = None
+llm = None
 
 
 @app.on_event("startup")
 async def load_data():
-    """Load the CSV data on startup"""
-    global df
+    """Load the CSV data and initialize AI on startup"""
+    global df, llm
     try:
         df = pd.read_csv(DATA_PATH)
         
@@ -38,6 +43,24 @@ async def load_data():
         df['yearend_numeric'] = pd.to_numeric(df['yearend_numeric'], errors='coerce')
         
         print(f"✓ Loaded {len(df)} records from {DATA_PATH.name}")
+        
+        # Initialize Bedrock AI (optional - only if AWS credentials are available)
+        try:
+            session = boto3.Session(profile_name='atn-developer')
+            bedrock_runtime = session.client('bedrock-runtime', region_name='us-east-1')
+            llm = ChatBedrock(
+                client=bedrock_runtime,
+                model_id="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+                model_kwargs={
+                    "max_tokens": 128000,
+                    "temperature": 0.8,
+                }
+            )
+            print(f"✓ Bedrock AI initialized")
+        except Exception as ai_error:
+            print(f"⚠️  Bedrock AI not available: {ai_error}")
+            llm = None
+            
     except Exception as e:
         print(f"Error loading data: {e}")
         raise
@@ -441,6 +464,198 @@ async def get_country_timeline(country: str):
         "timeline": timeline,
         "count": len(timeline)
     }
+
+
+@app.get("/api/speeches")
+async def get_speeches(
+    country: Optional[str] = None,
+    ideology: Optional[int] = None,
+    speech_type: Optional[str] = None
+):
+    """Get list of available speeches with metadata"""
+    if df is None:
+        raise HTTPException(status_code=500, detail="Data not loaded")
+    
+    filtered_df = df.copy()
+    
+    # Apply filters
+    if country:
+        filtered_df = filtered_df[filtered_df['country'] == country]
+    
+    if ideology is not None:
+        filtered_df = filtered_df[filtered_df['lr'] == ideology]
+    
+    speeches = []
+    speech_columns = {
+        'campaign': ['campaign_file', 'campaign_average'],
+        'famous': ['famous_file', 'famous_average'],
+        'international': ['international_file', 'international_average'],
+        'ribbon': ['ribbon_file', 'ribbon_average']
+    }
+    
+    # If speech_type filter is specified, only check that column
+    types_to_check = [speech_type] if speech_type and speech_type != 'total' else speech_columns.keys()
+    
+    for _, row in filtered_df.iterrows():
+        for stype in types_to_check:
+            file_col, avg_col = speech_columns[stype]
+            filename = row[file_col]
+            
+            if pd.notna(filename) and filename != '':
+                # Handle ideology - convert to int only if not NaN
+                ideology_val = int(row['lr']) if pd.notna(row['lr']) else None
+                ideology_label = "Unknown"
+                if ideology_val == -1:
+                    ideology_label = "Left"
+                elif ideology_val == 0:
+                    ideology_label = "Center"
+                elif ideology_val == 1:
+                    ideology_label = "Right"
+                
+                speeches.append({
+                    "filename": filename,
+                    "country": row['country'],
+                    "leader": row['leader'],
+                    "party": row['party'] if pd.notna(row['party']) else None,
+                    "ideology": ideology_val,
+                    "ideology_label": ideology_label,
+                    "speech_type": stype,
+                    "populism_score": float(row[avg_col]) if pd.notna(row[avg_col]) else 0,
+                    "year_start": int(row['yearbegin']),
+                    "year_end": row['yearend'] if row['yearend'] != 'current' else 2026,
+                    "term": int(row['term'])
+                })
+    
+    # Sort by country, then leader, then speech type
+    speeches.sort(key=lambda x: (x['country'], x['leader'], x['speech_type']))
+    
+    return {
+        "speeches": speeches,
+        "count": len(speeches),
+        "filters": {
+            "country": country,
+            "ideology": ideology,
+            "speech_type": speech_type
+        }
+    }
+
+
+@app.get("/api/speeches/{filename}")
+async def get_speech_content(filename: str):
+    """Get the content of a specific speech file"""
+    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20220427"
+    file_path = speeches_path / filename
+    
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail=f"Speech file '{filename}' not found")
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+        
+        word_count = len(content.split())
+        
+        return {
+            "filename": filename,
+            "content": content,
+            "word_count": word_count
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reading speech file: {str(e)}")
+
+
+@app.post("/api/speeches/{filename}/analyze")
+async def analyze_speech(filename: str):
+    """Analyze a speech using AI to generate summary and populism assessment"""
+    if llm is None:
+        raise HTTPException(status_code=503, detail="AI analysis service not available")
+    
+    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20220427"
+    file_path = speeches_path / filename
+    
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail=f"Speech file '{filename}' not found")
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+        
+        # Truncate speech for analysis
+        max_words = 2000
+        words = content.split()
+        if len(words) > max_words:
+            analysis_content = ' '.join(words[:max_words]) + "..."
+        else:
+            analysis_content = content
+        
+        # Summary chain
+        summary_template = """Analyze this political speech and provide a concise summary in 3-4 sentences.
+Focus on the main themes, key messages, and overall tone.
+
+Speech:
+{speech}
+
+Summary:"""
+        summary_prompt = PromptTemplate(template=summary_template, input_variables=["speech"])
+        summary_chain = summary_prompt | llm | StrOutputParser()
+        
+        # Populism assessment chain
+        populism_template = """You are an expert political analyst specializing in populism research.
+Analyze this political speech and assess its level of populism on a scale from 0 to 2.
+
+Populism indicators include:
+- Anti-elite rhetoric
+- People-centrism (appeals to "the people")
+- Criticism of establishment institutions
+- Us vs. them framing
+- Claims of representing the "real people"
+- Conspiracy theories or distrust of experts
+
+Speech excerpt:
+{speech}
+
+Provide:
+1. A populism score (0-2, where 0=not populist, 1=moderately populist, 2=highly populist)
+2. Brief justification (2-3 sentences)
+3. Key populist phrases or themes identified
+
+Assessment:"""
+        populism_prompt = PromptTemplate(template=populism_template, input_variables=["speech"])
+        populism_chain = populism_prompt | llm | StrOutputParser()
+        
+        # Generate analyses
+        summary = summary_chain.invoke({"speech": analysis_content})
+        assessment = populism_chain.invoke({"speech": analysis_content})
+        
+        return {
+            "filename": filename,
+            "summary": summary,
+            "populism_assessment": assessment,
+            "analyzed_words": min(len(words), max_words),
+            "total_words": len(words)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error analyzing speech: {str(e)}")
+
+
+    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20220427"
+    file_path = speeches_path / filename
+    
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail=f"Speech file '{filename}' not found")
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+        
+        return {
+            "filename": filename,
+            "content": content,
+            "word_count": len(content.split())
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reading speech file: {str(e)}")
 
 
 # Mount static files for frontend

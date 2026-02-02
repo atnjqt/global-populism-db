@@ -1,6 +1,6 @@
 import type { SummaryResponse } from '@/types';
 
-type TabType = 'map' | 'rankings' | 'about';
+type TabType = 'map' | 'speeches' | 'about';
 
 interface HeaderProps {
   summary?: SummaryResponse;
@@ -21,10 +21,10 @@ export default function Header({ summary, activeTab, onTabChange }: HeaderProps)
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
           </svg>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h1 className="text-3xl font-semibold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
               Global Populism Database UI
             </h1>
-            <p className="text-sm text-blue-200/80 tracking-wide">
+            <p className="text-small text-blue-200/80 tracking-wide">
               Interactive visualization of{' '}
               <a 
                 href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LFTQEZ"
@@ -81,17 +81,17 @@ export default function Header({ summary, activeTab, onTabChange }: HeaderProps)
             Map
           </button>
           <button 
-            onClick={() => onTabChange('rankings')}
+            onClick={() => onTabChange('speeches')}
             className={`px-5 py-2 text-sm font-medium flex items-center gap-2 ${
-              activeTab === 'rankings'
+              activeTab === 'speeches'
                 ? 'text-white border-b-2 border-blue-400 bg-white/10'
                 : 'text-blue-200/70 hover:text-white hover:bg-white/5'
             }`}
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            Rankings
+            Speeches
           </button>
           <button 
             onClick={() => onTabChange('about')}
