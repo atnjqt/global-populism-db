@@ -191,17 +191,23 @@ async def get_map_data(
     year_start: Optional[int] = None,
     year_end: Optional[int] = None,
     speech_type: Optional[str] = "total",
-    time_weighted: Optional[bool] = False
+    time_weighted: Optional[bool] = False,
+    ideology: Optional[int] = None
 ):
     """
     Get aggregated data for map visualization
     Returns average populism scores by country
     With time_weighted=True, weights each term by overlap years with the filter range
+    ideology: -1=Left, 0=Center, 1=Right (filters leaders before averaging)
     """
     if df is None:
         raise HTTPException(status_code=500, detail="Data not loaded")
     
     filtered_df = df.copy()
+    
+    # Filter by ideology first (before year filtering)
+    if ideology is not None:
+        filtered_df = filtered_df[filtered_df['lr'] == ideology]
     
     # Filter by year range - include terms that overlap with the selected period
     # A term overlaps if: term_start <= year_end AND term_end >= year_start
@@ -438,10 +444,17 @@ async def get_country_timeline(country: str):
 
 
 # Mount static files for frontend
+# Priority: frontend-react/dist (production React build) > frontend (legacy HTML)
 try:
-    static_path = Path(__file__).parent.parent / "frontend"
-    if static_path.exists():
-        app.mount("/", StaticFiles(directory=str(static_path), html=True), name="frontend")
+    react_dist_path = Path(__file__).parent.parent / "frontend-react" / "dist"
+    legacy_static_path = Path(__file__).parent.parent / "frontend"
+    
+    if react_dist_path.exists():
+        app.mount("/", StaticFiles(directory=str(react_dist_path), html=True), name="frontend")
+        print(f"✓ Serving React build from {react_dist_path}")
+    elif legacy_static_path.exists():
+        app.mount("/", StaticFiles(directory=str(legacy_static_path), html=True), name="frontend")
+        print(f"✓ Serving legacy frontend from {legacy_static_path}")
 except Exception as e:
     print(f"Note: Frontend not mounted - {e}")
 
