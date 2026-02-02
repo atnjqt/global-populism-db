@@ -36,8 +36,8 @@ function getIdeologyColor(ideology: number, populism: number): string {
     // Left = Blue (hue 220)
     return `hsl(220, 70%, ${lightness}%)`;
   } else if (ideology === 0) {
-    // Center = Emerald/Green (hue 160)
-    return `hsl(160, 60%, ${lightness}%)`;
+    // Center = Green (hue 160)
+    return `hsl(160, 70%, ${lightness}%)`;
   } else if (ideology === 1) {
     // Right = Red (hue 0)
     return `hsl(0, 70%, ${lightness}%)`;
@@ -47,14 +47,14 @@ function getIdeologyColor(ideology: number, populism: number): string {
   return `hsl(0, 0%, ${lightness + 20}%)`;
 }
 
-// Original populism-only color scheme
+// Colorblind-friendly populism color scheme: Blue to Purple to Orange
 function getPopulismColor(score: number | undefined): string {
   if (score === undefined || score === null) return '#e5e7eb';
-  if (score >= 1.5) return '#991b1b'; // red-800
-  if (score >= 1.0) return '#dc2626'; // red-600
-  if (score >= 0.5) return '#f97316'; // orange-500
-  if (score >= 0.2) return '#facc15'; // yellow-400
-  return '#86efac'; // green-300
+  if (score >= 1.5) return '#991b1b'; // red-800 - very high
+  if (score >= 1.0) return '#dc2626'; // red-600 - high
+  if (score >= 0.5) return '#f97316'; // orange-500 - medium
+  if (score >= 0.2) return '#facc15'; // yellow-400 - low
+  return '#86efac'; // green-300 - very low
 }
 
 export default function MapView({ data, isLoading, onCountryClick, selectedCountry, ideologyFilter, colorByIdeology }: MapViewProps) {
@@ -174,7 +174,7 @@ export default function MapView({ data, isLoading, onCountryClick, selectedCount
 
   if (isLoading || !geoData) {
     return (
-      <div className="h-[550px] flex items-center justify-center text-gray-500">
+      <div className="h-full flex items-center justify-center text-gray-500">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
           <p>Loading map data...</p>
@@ -184,7 +184,7 @@ export default function MapView({ data, isLoading, onCountryClick, selectedCount
   }
 
   return (
-    <div className="h-[550px] rounded-lg overflow-hidden">
+    <div className="h-full rounded-lg overflow-hidden">
       <MapContainer
         center={[20, 0]}
         zoom={2}

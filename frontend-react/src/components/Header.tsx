@@ -1,13 +1,17 @@
 import type { SummaryResponse } from '@/types';
 
+type TabType = 'map' | 'rankings' | 'about';
+
 interface HeaderProps {
   summary?: SummaryResponse;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
 }
 
-export default function Header({ summary }: HeaderProps) {
+export default function Header({ summary, activeTab, onTabChange }: HeaderProps) {
   return (
     <header className="bg-gradient-to-r from-slate-800 via-blue-900 to-indigo-900 text-white shadow-lg sticky top-0 z-50">
-      <div className="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-[1400px] mx-auto px-6 py-2 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <svg
             className="w-9 h-9 opacity-90"
@@ -18,9 +22,19 @@ export default function Header({ summary }: HeaderProps) {
           </svg>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-              Global Populism Database
+              Global Populism Database UI
             </h1>
-            <p className="text-sm text-blue-200/80 tracking-wide">Interactive visualization of populist rhetoric worldwide</p>
+            <p className="text-sm text-blue-200/80 tracking-wide">
+              Interactive visualization of{' '}
+              <a 
+                href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LFTQEZ"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-white transition-colors"
+              >
+                Harvard Dataverse coded speech dataset v2.1
+              </a>
+            </p>
           </div>
         </div>
         
@@ -53,19 +67,40 @@ export default function Header({ summary }: HeaderProps) {
       {/* Navigation Tabs */}
       <nav className="max-w-[1400px] mx-auto px-6 border-t border-white/10">
         <div className="flex">
-          <button className="px-5 py-2.5 text-sm font-medium text-white border-b-2 border-blue-400 bg-white/10 flex items-center gap-2">
+          <button 
+            onClick={() => onTabChange('map')}
+            className={`px-5 py-2 text-sm font-medium flex items-center gap-2 ${
+              activeTab === 'map'
+                ? 'text-white border-b-2 border-blue-400 bg-white/10'
+                : 'text-blue-200/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z" />
             </svg>
             Map
           </button>
-          <button className="px-5 py-2.5 text-sm font-medium text-blue-200/70 hover:text-white hover:bg-white/5 flex items-center gap-2">
+          <button 
+            onClick={() => onTabChange('rankings')}
+            className={`px-5 py-2 text-sm font-medium flex items-center gap-2 ${
+              activeTab === 'rankings'
+                ? 'text-white border-b-2 border-blue-400 bg-white/10'
+                : 'text-blue-200/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
             </svg>
             Rankings
           </button>
-          <button className="px-5 py-2.5 text-sm font-medium text-blue-200/70 hover:text-white hover:bg-white/5 flex items-center gap-2">
+          <button 
+            onClick={() => onTabChange('about')}
+            className={`px-5 py-2 text-sm font-medium flex items-center gap-2 ${
+              activeTab === 'about'
+                ? 'text-white border-b-2 border-blue-400 bg-white/10'
+                : 'text-blue-200/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z" />
             </svg>

@@ -77,16 +77,6 @@ export default function Sidebar({
           </h3>
           <div className="flex gap-1">
             <button
-              onClick={() => onColorByIdeologyChange(true)}
-              className={`flex-1 py-2 px-2 rounded-lg text-xs font-medium transition-all ${
-                colorByIdeology
-                  ? 'bg-gray-700 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              By Ideology
-            </button>
-            <button
               onClick={() => onColorByIdeologyChange(false)}
               className={`flex-1 py-2 px-2 rounded-lg text-xs font-medium transition-all ${
                 !colorByIdeology
@@ -95,6 +85,16 @@ export default function Sidebar({
               }`}
             >
               Populism Only
+            </button>
+            <button
+              onClick={() => onColorByIdeologyChange(true)}
+              className={`flex-1 py-2 px-2 rounded-lg text-xs font-medium transition-all ${
+                colorByIdeology
+                  ? 'bg-gray-700 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              By Ideology
             </button>
           </div>
         </div>
@@ -150,60 +150,6 @@ export default function Sidebar({
             ))}
           </select>
         </div>
-      </div>
-
-      {/* Legend Card */}
-      <div className="bg-white rounded-lg shadow-md p-4">
-        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
-          Legend
-        </h3>
-        {colorByIdeology ? (
-          <div className="space-y-3">
-            <div>
-              <div className="text-xs text-gray-500 mb-2">Ideology Colors</div>
-              <div className="flex gap-2">
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 rounded bg-blue-500" />
-                  <span className="text-xs text-gray-600">Left</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 rounded bg-emerald-500" />
-                  <span className="text-xs text-gray-600">Center</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 rounded bg-red-500" />
-                  <span className="text-xs text-gray-600">Right</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="text-xs text-gray-500 mb-2">Shade = Populism</div>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 h-3 rounded bg-gradient-to-r from-gray-200 via-gray-400 to-gray-800" />
-              </div>
-              <div className="flex justify-between text-[10px] text-gray-400 mt-1">
-                <span>0.0 Low</span>
-                <span>2.0 High</span>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {[
-              { color: 'bg-red-800', label: '1.5 - 2.0 (Very High)' },
-              { color: 'bg-red-600', label: '1.0 - 1.5 (High)' },
-              { color: 'bg-orange-500', label: '0.5 - 1.0 (Medium)' },
-              { color: 'bg-yellow-400', label: '0.2 - 0.5 (Low)' },
-              { color: 'bg-green-300', label: '0.0 - 0.2 (Very Low)' },
-              { color: 'bg-gray-200', label: 'No Data' },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-3">
-                <div className={`w-6 h-4 rounded ${item.color} border border-gray-300`} />
-                <span className="text-xs text-gray-600">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </aside>
   );
