@@ -7,7 +7,8 @@ import type {
   SpeechType,
   SpeechesResponse,
   SpeechContentResponse,
-  SpeechAnalysisResponse
+  SpeechAnalysisResponse,
+  BedrockModel
 } from '@/types';
 
 const API_BASE = '/api';
@@ -94,10 +95,20 @@ export async function fetchSpeechContent(filename: string): Promise<SpeechConten
   return response.json();
 }
 
-export async function analyzeSpeech(filename: string): Promise<SpeechAnalysisResponse> {
-  const response = await fetch(`${API_BASE}/speeches/${encodeURIComponent(filename)}/analyze`, {
+export async function analyzeSpeech(filename: string, model_id?: string): Promise<SpeechAnalysisResponse> {
+  let url = `${API_BASE}/speeches/${encodeURIComponent(filename)}/analyze`;
+  if (model_id) {
+    url += `?model_id=${encodeURIComponent(model_id)}`;
+  }
+  const response = await fetch(url, {
     method: 'POST',
   });
   if (!response.ok) throw new Error('Failed to analyze speech');
+  return response.json();
+}
+
+export async function fetchModels(): Promise<{ models: BedrockModel[] }> {
+  const response = await fetch(`${API_BASE}/models`);
+  if (!response.ok) throw new Error('Failed to fetch models');
   return response.json();
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { useSpeeches, useSpeechContent, useCountries, useAnalyzeSpeech } from '@/hooks/useApi';
-import type { Ideology, SpeechType, SpeechAnalysisResponse } from '@/types';
+import { useSpeeches, useSpeechContent, useCountries, useAnalyzeSpeech, useModels } from '@/hooks/useApi';
+import type { Ideology, SpeechType, SpeechAnalysisResponse, BedrockModel } from '@/types';
 
 export default function Speeches() {
   const [selectedCountry, setSelectedCountry] = useState<string>('');
@@ -11,9 +11,11 @@ export default function Speeches() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisData, setAnalysisData] = useState<SpeechAnalysisResponse | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string>('us.anthropic.claude-sonnet-4-5-20250929-v1:0');
   const speechListRef = useRef<HTMLDivElement>(null);
 
   const { data: countriesData } = useCountries();
+  const { data: modelsData } = useModels();
   const { data: speechesData, isLoading: speechesLoading } = useSpeeches({
     country: selectedCountry || undefined,
     ideology: selectedIdeology ?? undefined,
@@ -65,7 +67,7 @@ export default function Speeches() {
     if (!selectedFilename) return;
     
     try {
-      const result = await analyzeMutation.mutateAsync(selectedFilename);
+      const result = await analyzeMutation.mutateAsync({ filename: selectedFilename, model_id: selectedModel });
       setAnalysisData(result);
       setShowAnalysis(true);
     } catch (error) {
@@ -294,7 +296,18 @@ export default function Speeches() {
                     </div>
                   </div>
                   <div className="ml-4 flex items-start gap-2">
-                    <div className="flex flex-col items-end">
+                    <div className="flex flex-col items-end gap-2">
+                      <select
+                        value={selectedModel}
+                        onChange={(e) => setSelectedModel(e.target.value)}
+                        className="text-xs px-2 py-1 border border-gray-300 rounded bg-white text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      >
+                        {modelsData?.models.map((model) => (
+                          <option key={model.id} value={model.id}>
+                            {model.name}
+                          </option>
+                        ))}
+                      </select>
                       <button
                         onClick={handleAnalyze}
                         disabled={analyzeMutation.isPending}
@@ -314,9 +327,6 @@ export default function Speeches() {
                           </>
                         )}
                       </button>
-                      <div className="text-xs text-gray-400 mt-1">
-                        <code>us.anthropic.claude-sonnet-4-5-20250929-v1:0</code>
-                      </div>
                     </div>
                     <button
                       onClick={() => setSelectedFilename(null)}

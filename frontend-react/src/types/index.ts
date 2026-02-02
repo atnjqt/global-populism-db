@@ -54,6 +54,7 @@ export interface SummaryResponse {
   total_records: number;
   total_countries: number;
   total_leaders: number;
+  total_speeches: number;
   year_range: {
     min: number;
     max: number;
@@ -139,6 +140,13 @@ export interface SpeechAnalysisResponse {
   populism_assessment: string;
   analyzed_words: number;
   total_words: number;
+  model_id: string;
+}
+
+export interface BedrockModel {
+  id: string;
+  name: string;
+  provider: string;
 }
 
 export type SpeechType = 'total' | 'campaign' | 'famous' | 'international' | 'ribbon';

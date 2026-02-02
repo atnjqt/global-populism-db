@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { fetchSummary, fetchCountries, fetchData, fetchMapData, fetchTimeline, fetchSpeeches, fetchSpeechContent, analyzeSpeech } from '@/api';
+import { fetchSummary, fetchCountries, fetchData, fetchMapData, fetchTimeline, fetchSpeeches, fetchSpeechContent, analyzeSpeech, fetchModels } from '@/api';
 import type { SpeechType } from '@/types';
 
 export function useSummary() {
@@ -71,6 +71,13 @@ export function useSpeechContent(filename: string | null) {
 
 export function useAnalyzeSpeech() {
   return useMutation({
-    mutationFn: (filename: string) => analyzeSpeech(filename),
+    mutationFn: ({ filename, model_id }: { filename: string; model_id?: string }) => analyzeSpeech(filename, model_id),
+  });
+}
+
+export function useModels() {
+  return useQuery({
+    queryKey: ['models'],
+    queryFn: fetchModels,
   });
 }

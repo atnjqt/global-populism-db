@@ -28,7 +28,7 @@ export default function Header({ summary, activeTab, onTabChange }: HeaderProps)
             </svg>
           </div>
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h1 className="text-4xl font-semibold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
               Global Populism Database UI
             </h1>
             <p className="text-small text-blue-200/80 tracking-wide">
@@ -61,6 +61,11 @@ export default function Header({ summary, activeTab, onTabChange }: HeaderProps)
             <div className="text-center">
               <div className="text-lg font-bold text-white">{summary.total_leaders}</div>
               <div className="text-[10px] text-blue-200/70 uppercase tracking-wide">Leaders</div>
+            </div>
+            <div className="w-px h-8 bg-white/20" />
+            <div className="text-center">
+              <div className="text-lg font-bold text-white">{summary.total_speeches}</div>
+              <div className="text-[10px] text-blue-200/70 uppercase tracking-wide">Speeches</div>
             </div>
             <div className="w-px h-8 bg-white/20" />
             <div className="text-center">

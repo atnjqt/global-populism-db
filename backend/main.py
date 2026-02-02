@@ -50,7 +50,8 @@ async def load_data():
             bedrock_runtime = session.client('bedrock-runtime', region_name='us-east-1')
             llm = ChatBedrock(
                 client=bedrock_runtime,
-                model_id="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+                #model_id="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+                model_id="openai.gpt-oss-120b-1:0",
                 model_kwargs={
                     "max_tokens": 128000,
                     "temperature": 0.8,
@@ -185,10 +186,16 @@ async def get_summary():
     if df is None:
         raise HTTPException(status_code=500, detail="Data not loaded")
     
+    # Count unique speech files
+    speech_files = set()
+    for col in ['campaign_file', 'famous_file', 'international_file', 'ribbon_file']:
+        speech_files.update(df[col].dropna().unique())
+    
     return {
         "total_records": len(df),
         "total_countries": df['country'].nunique(),
         "total_leaders": df['leader'].nunique(),
+        "total_speeches": len(speech_files),
         "year_range": {
             "min": int(df['yearbegin'].min()),
             "max": int(df['yearend_numeric'].max())
@@ -543,7 +550,7 @@ async def get_speeches(
 @app.get("/api/speeches/{filename}")
 async def get_speech_content(filename: str):
     """Get the content of a specific speech file"""
-    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20220427"
+    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20251120"
     file_path = speeches_path / filename
     
     if not file_path.exists():
@@ -564,19 +571,54 @@ async def get_speech_content(filename: str):
         raise HTTPException(status_code=500, detail=f"Error reading speech file: {str(e)}")
 
 
+@app.get("/api/models")
+async def get_available_models():
+    """Get list of available Bedrock models for speech analysis"""
+    models = [
+        {
+            "id": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+            "name": "Claude Sonnet 4.5",
+            "provider": "Anthropic"
+        },
+        {
+            "id": "openai.gpt-oss-120b-1:0",
+            "name": "GPT-OSS 120B",
+            "provider": "OpenAI"
+        },
+        {
+            "id": "openai.gpt-oss-20b-1:0",
+            "name": "GPT-OSS 20B",
+            "provider": "OpenAI"
+        }
+    ]
+    return {"models": models}
+
+
 @app.post("/api/speeches/{filename}/analyze")
-async def analyze_speech(filename: str):
+async def analyze_speech(filename: str, model_id: Optional[str] = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"):
     """Analyze a speech using AI to generate summary and populism assessment"""
     if llm is None:
         raise HTTPException(status_code=503, detail="AI analysis service not available")
     
-    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20220427"
+    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20251120"
     file_path = speeches_path / filename
     
     if not file_path.exists():
         raise HTTPException(status_code=404, detail=f"Speech file '{filename}' not found")
     
     try:
+        # Create LLM instance with selected model
+        session = boto3.Session(profile_name='atn-developer')
+        bedrock_runtime = session.client('bedrock-runtime', region_name='us-east-1')
+        analysis_llm = ChatBedrock(
+            client=bedrock_runtime,
+            model_id=model_id,
+            model_kwargs={
+                "max_tokens": 128000,
+                "temperature": 0.8,
+            }
+        )
+        
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
             content = f.read()
         
@@ -590,38 +632,38 @@ async def analyze_speech(filename: str):
         
         # Summary chain
         summary_template = """Analyze this political speech and provide a concise summary in 3-4 sentences.
-Focus on the main themes, key messages, and overall tone.
+        Focus on the main themes, key messages, and overall tone.
 
-Speech:
-{speech}
+        Speech:
+        {speech}
 
-Summary:"""
+        Summary:"""
         summary_prompt = PromptTemplate(template=summary_template, input_variables=["speech"])
-        summary_chain = summary_prompt | llm | StrOutputParser()
+        summary_chain = summary_prompt | analysis_llm | StrOutputParser()
         
         # Populism assessment chain
         populism_template = """You are an expert political analyst specializing in populism research.
-Analyze this political speech and assess its level of populism on a scale from 0 to 2.
+        Analyze this political speech and assess its level of populism on a scale from 0 to 2.
 
-Populism indicators include:
-- Anti-elite rhetoric
-- People-centrism (appeals to "the people")
-- Criticism of establishment institutions
-- Us vs. them framing
-- Claims of representing the "real people"
-- Conspiracy theories or distrust of experts
+        Populism indicators include:
+        - Anti-elite rhetoric
+        - People-centrism (appeals to "the people")
+        - Criticism of establishment institutions
+        - Us vs. them framing
+        - Claims of representing the "real people"
+        - Conspiracy theories or distrust of experts
 
-Speech excerpt:
-{speech}
+        Speech excerpt:
+        {speech}
 
-Provide:
-1. A populism score (0-2, where 0=not populist, 1=moderately populist, 2=highly populist)
-2. Brief justification (2-3 sentences)
-3. Key populist phrases or themes identified
+        Provide:
+        1. A populism score (0-2, where 0=not populist, 1=moderately populist, 2=highly populist)
+        2. Brief justification (2-3 sentences)
+        3. Key populist phrases or themes identified
 
-Assessment:"""
+        Assessment:"""
         populism_prompt = PromptTemplate(template=populism_template, input_variables=["speech"])
-        populism_chain = populism_prompt | llm | StrOutputParser()
+        populism_chain = populism_prompt | analysis_llm | StrOutputParser()
         
         # Generate analyses
         summary = summary_chain.invoke({"speech": analysis_content})
@@ -632,19 +674,20 @@ Assessment:"""
             "summary": summary,
             "populism_assessment": assessment,
             "analyzed_words": min(len(words), max_words),
-            "total_words": len(words)
+            "total_words": len(words),
+            "model_id": model_id
         }
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error analyzing speech: {str(e)}")
 
 
-    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20220427"
+    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20251120"
     file_path = speeches_path / filename
-    
+
     if not file_path.exists():
         raise HTTPException(status_code=404, detail=f"Speech file '{filename}' not found")
-    
+
     try:
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
             content = f.read()
