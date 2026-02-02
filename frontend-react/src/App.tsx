@@ -14,7 +14,7 @@ function App() {
   const [colorByIdeology, setColorByIdeology] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
-  const { data: summary, isLoading: summaryLoading } = useSummary();
+  const { data: summary } = useSummary();
   const { data: mapData, isLoading: mapLoading } = useMapData({
     year_start: yearStart,
     year_end: yearEnd,
@@ -24,35 +24,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header />
+      <Header summary={summary} />
       
       <main className="max-w-[1400px] mx-auto px-4 py-6">
-        {/* Stats Bar */}
-        {summary && !summaryLoading && (
-          <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-            <div className="flex justify-center gap-12">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary-500">{summary.total_records}</div>
-                <div className="text-sm text-gray-600">Records</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary-500">{summary.total_countries}</div>
-                <div className="text-sm text-gray-600">Countries</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary-500">{summary.total_leaders}</div>
-                <div className="text-sm text-gray-600">Leaders</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary-500">
-                  {summary.year_range.min} - {summary.year_range.max}
-                </div>
-                <div className="text-sm text-gray-600">Year Range</div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Main Layout */}
         <div className="grid grid-cols-[240px_1fr_220px] gap-4">
           {/* Left Sidebar - Controls */}

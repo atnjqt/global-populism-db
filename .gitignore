@@ -1,5 +1,7 @@
 # data files
 dataverse_files/
+*/node_modules/
+
 
 # Python virtual environment
 venv/
