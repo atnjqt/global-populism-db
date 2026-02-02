@@ -4,7 +4,7 @@
 
 ## Overview
 
-This repository aims to provide tools for researchers interested in the **Global Populism Database provided by Harvard Dataverse** (see [here](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LFTQEZ)).
+This repository aims to provide tools for researchers interested in the **Global Populism Database v2.1 provided by Harvard Dataverse** (see [DOI 10.7910/DVN/LFTQEZ](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LFTQEZ)).
 
 ![image of the web UI](assets/image.png)
 
@@ -167,12 +167,6 @@ curl "http://localhost:8000/api/map-data?year_start=2010&year_end=2020"
 - [ ] Export functionality for filtered datasets
 - [ ] Additional visualization types (timelines, comparisons)
 
-## Data Source
-
-This application uses the **Global Populism Database (GPD) v2.1** from Harvard Dataverse:
-- DOI: [10.7910/DVN/LFTQEZ](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/LFTQEZ)
-- Please cite the original authors when using this data
-
 ## License
 
-Please refer to the original dataset license on Harvard Dataverse.
+Please refer to the original dataset license on Harvard Dataverse. For the code in this repository, see the [LICENSE file](LICENSE.md).
