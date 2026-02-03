@@ -2,8 +2,19 @@
 dataverse_files/
 */node_modules/
 
+# terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+*/.terraform/
+*/.terraform.lock.hcl
+
+# lambda
+lambda_package
 
 # Python virtual environment
+.venv_lambda/
 venv/
 .venv/
 env/

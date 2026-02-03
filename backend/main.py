@@ -7,9 +7,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import pandas as pd
 import json
+import os
 from typing import Optional, List
 from pathlib import Path
 import boto3
+from io import StringIO
 from langchain_aws import ChatBedrock
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -25,29 +27,52 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Configuration
+S3_BUCKET = os.environ.get("S3_BUCKET", "static.ejacquot.com")
+S3_PREFIX = os.environ.get("S3_PREFIX", "gpd/dataverse_files")
+AWS_PROFILE = os.environ.get("AWS_PROFILE", None)  # None for Lambda (uses role)
+
 # Load data
-DATA_PATH = Path(__file__).parent.parent / "dataverse_files" / "GPD_v2.1_20251120_Wide.csv"
 df = None
 llm = None
+s3_client = None
 
 
 @app.on_event("startup")
 async def load_data():
     """Load the CSV data and initialize AI on startup"""
-    global df, llm
+    global df, llm, s3_client
     try:
-        df = pd.read_csv(DATA_PATH)
+        # Initialize S3 client
+        if AWS_PROFILE:
+            # Local development with profile
+            session = boto3.Session(profile_name=AWS_PROFILE)
+            s3_client = session.client('s3')
+        else:
+            # Lambda (uses IAM role)
+            s3_client = boto3.client('s3')
+        
+        # Load CSV from S3
+        csv_key = f"{S3_PREFIX}/GPD_v2.1_20251120_Wide.csv"
+        print(f"Loading CSV from s3://{S3_BUCKET}/{csv_key}")
+        
+        response = s3_client.get_object(Bucket=S3_BUCKET, Key=csv_key)
+        csv_content = response['Body'].read().decode('utf-8')
+        df = pd.read_csv(StringIO(csv_content))
         
         # Convert 'current' to 2026 for easier filtering
         df['yearend_numeric'] = df['yearend'].replace('current', 2026)
         df['yearend_numeric'] = pd.to_numeric(df['yearend_numeric'], errors='coerce')
         
-        print(f"✓ Loaded {len(df)} records from {DATA_PATH.name}")
+        print(f"✓ Loaded {len(df)} records from S3")
         
         # Initialize Bedrock AI (optional - only if AWS credentials are available)
         try:
-            session = boto3.Session(profile_name='atn-developer')
-            bedrock_runtime = session.client('bedrock-runtime', region_name='us-east-1')
+            if AWS_PROFILE:
+                session = boto3.Session(profile_name=AWS_PROFILE)
+                bedrock_runtime = session.client('bedrock-runtime', region_name='us-east-1')
+            else:
+                bedrock_runtime = boto3.client('bedrock-runtime', region_name='us-east-1')
             llm = ChatBedrock(
                 client=bedrock_runtime,
                 #model_id="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
@@ -550,15 +575,10 @@ async def get_speeches(
 @app.get("/api/speeches/{filename}")
 async def get_speech_content(filename: str):
     """Get the content of a specific speech file"""
-    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20251120"
-    file_path = speeches_path / filename
-    
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail=f"Speech file '{filename}' not found")
-    
     try:
-        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-            content = f.read()
+        speech_key = f"{S3_PREFIX}/speeches_20251120/{filename}"
+        response = s3_client.get_object(Bucket=S3_BUCKET, Key=speech_key)
+        content = response['Body'].read().decode('utf-8', errors='ignore')
         
         word_count = len(content.split())
         
@@ -567,6 +587,8 @@ async def get_speech_content(filename: str):
             "content": content,
             "word_count": word_count
         }
+    except s3_client.exceptions.NoSuchKey:
+        raise HTTPException(status_code=404, detail=f"Speech file '{filename}' not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reading speech file: {str(e)}")
 
@@ -600,16 +622,19 @@ async def analyze_speech(filename: str, model_id: Optional[str] = "us.anthropic.
     if llm is None:
         raise HTTPException(status_code=503, detail="AI analysis service not available")
     
-    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20251120"
-    file_path = speeches_path / filename
-    
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail=f"Speech file '{filename}' not found")
-    
     try:
+        # Read speech from S3
+        speech_key = f"{S3_PREFIX}/speeches_20251120/{filename}"
+        response = s3_client.get_object(Bucket=S3_BUCKET, Key=speech_key)
+        content = response['Body'].read().decode('utf-8', errors='ignore')
+        
         # Create LLM instance with selected model
-        session = boto3.Session(profile_name='atn-developer')
-        bedrock_runtime = session.client('bedrock-runtime', region_name='us-east-1')
+        if AWS_PROFILE:
+            session = boto3.Session(profile_name=AWS_PROFILE)
+            bedrock_runtime = session.client('bedrock-runtime', region_name='us-east-1')
+        else:
+            bedrock_runtime = boto3.client('bedrock-runtime', region_name='us-east-1')
+            
         analysis_llm = ChatBedrock(
             client=bedrock_runtime,
             model_id=model_id,
@@ -618,9 +643,6 @@ async def analyze_speech(filename: str, model_id: Optional[str] = "us.anthropic.
                 "temperature": 0.8,
             }
         )
-        
-        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-            content = f.read()
         
         # Truncate speech for analysis
         max_words = 2000
@@ -678,27 +700,10 @@ async def analyze_speech(filename: str, model_id: Optional[str] = "us.anthropic.
             "model_id": model_id
         }
         
+    except s3_client.exceptions.NoSuchKey:
+        raise HTTPException(status_code=404, detail=f"Speech file '{filename}' not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error analyzing speech: {str(e)}")
-
-
-    speeches_path = Path(__file__).parent.parent / "dataverse_files" / "speeches_20251120"
-    file_path = speeches_path / filename
-
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail=f"Speech file '{filename}' not found")
-
-    try:
-        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-            content = f.read()
-        
-        return {
-            "filename": filename,
-            "content": content,
-            "word_count": len(content.split())
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error reading speech file: {str(e)}")
 
 
 # Mount static files for frontend
