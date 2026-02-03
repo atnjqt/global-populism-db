@@ -1,16 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import MapView from '@/components/MapView';
 import Sidebar from '@/components/Sidebar';
 import CountryPanel from '@/components/CountryPanel';
 import About from '@/components/About';
 import Speeches from '@/components/Speeches';
+import PasswordPrompt from '@/components/PasswordPrompt';
 import { useSummary, useMapData } from '@/hooks/useApi';
 import type { SpeechType, Ideology } from '@/types';
 
 type TabType = 'map' | 'speeches' | 'about';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('map');
   const [yearStart, setYearStart] = useState(1990);
   const [yearEnd, setYearEnd] = useState(2026);
@@ -19,6 +21,7 @@ function App() {
   const [colorByIdeology, setColorByIdeology] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
+  // Always call hooks before any conditional returns
   const { data: summary } = useSummary();
   const { data: mapData, isLoading: mapLoading } = useMapData({
     year_start: yearStart,
@@ -26,6 +29,23 @@ function App() {
     speech_type: speechType,
     ideology: ideology,
   });
+
+  // Check if already authenticated
+  useEffect(() => {
+    const authStatus = sessionStorage.getItem('gpd_authenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleAuthenticated = () => {
+    sessionStorage.setItem('gpd_authenticated', 'true');
+    setIsAuthenticated(true);
+  };
+
+  if (!isAuthenticated) {
+    return <PasswordPrompt onAuthenticated={handleAuthenticated} />;
+  }
 
   return (
     <div className="h-screen bg-gray-100 flex flex-col overflow-hidden">

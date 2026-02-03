@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useSpeeches, useSpeechContent, useCountries, useAnalyzeSpeech, useModels } from '@/hooks/useApi';
-import type { Ideology, SpeechType, SpeechAnalysisResponse, BedrockModel } from '@/types';
+import type { Ideology, SpeechType, SpeechAnalysisResponse } from '@/types';
 
 export default function Speeches() {
   const [selectedCountry, setSelectedCountry] = useState<string>('');

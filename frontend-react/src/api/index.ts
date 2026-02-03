@@ -11,7 +11,7 @@ import type {
   BedrockModel
 } from '@/types';
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://global-populism-db.ejacquot.com/api';
 
 export async function fetchSummary(): Promise<SummaryResponse> {
   const response = await fetch(`${API_BASE}/summary`);
