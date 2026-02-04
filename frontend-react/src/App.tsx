@@ -48,19 +48,19 @@ function App() {
   }
 
   return (
-    <div className="h-screen bg-gray-100 flex flex-col overflow-hidden">
+    <div className="h-screen bg-gray-100 flex flex-col">
       <Header summary={summary} activeTab={activeTab} onTabChange={setActiveTab} />
       
-      <main className="flex-1 max-w-[1400px] max-h-[90vh] mx-auto px-4 pb-4 w-full overflow-hidden">
+      <main className="flex-1 max-w-[1400px] mx-auto px-2 sm:px-4 py-3 w-full overflow-y-auto">
         {activeTab === 'about' ? (
           <About />
         ) : activeTab === 'speeches' ? (
           <Speeches />
         ) : (
-          /* Main Layout */
-          <div className="grid grid-cols-[240px_1fr_220px] gap-3 h-full">
+          /* Main Layout - Stack on mobile, grid on desktop */
+          <div className="flex flex-col lg:grid lg:grid-cols-[200px_1fr_220px] gap-2 lg:gap-3 lg:h-full">
           {/* Left Sidebar - Controls */}
-          <div className="overflow-y-auto">
+          <div className="lg:overflow-y-auto">
             <Sidebar
               yearStart={yearStart}
               yearEnd={yearEnd}
@@ -76,7 +76,7 @@ function App() {
           </div>
 
           {/* Map */}
-          <div className="bg-white rounded-lg shadow-md p-2 h-full">
+          <div className="bg-white rounded-lg shadow-md p-1 lg:p-2 h-[550px] lg:h-full">
             <MapView
               data={mapData || []}
               isLoading={mapLoading}
@@ -88,7 +88,7 @@ function App() {
           </div>
 
           {/* Right Panel - Legend and Country Details */}
-          <div className="flex flex-col gap-3 h-full overflow-y-auto">
+          <div className="flex flex-col gap-3 lg:h-full overflow-y-auto">
             <CountryPanel
               country={selectedCountry}
               onClose={() => setSelectedCountry(null)}

@@ -12,6 +12,7 @@ export default function Speeches() {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisData, setAnalysisData] = useState<SpeechAnalysisResponse | null>(null);
   const [selectedModel, setSelectedModel] = useState<string>('us.anthropic.claude-sonnet-4-5-20250929-v1:0');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const speechListRef = useRef<HTMLDivElement>(null);
 
   const { data: countriesData } = useCountries();
@@ -101,12 +102,12 @@ export default function Speeches() {
   };
 
   return (
-    <div className="h-full bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Filters & Speech List */}
-        <div className="w-80 border-r border-gray-200 flex flex-col">
+    <div className="h-full bg-white rounded-lg shadow-lg overflow-hidden flex">
+      {/* Left Panel - Filters & Speech List */}
+      <div className={`${sidebarOpen ? 'w-80' : 'w-0'} transition-all duration-300 border-r border-gray-200 flex flex-col flex-shrink-0`}>
+        <div className={`w-80 flex flex-col h-full ${sidebarOpen ? '' : 'invisible'}`}>
           {/* Filters */}
-          <div className="p-4 border-b border-gray-200 bg-gray-50">
+          <div className="p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
             <h3 className="text-lg font-semibold text-gray-800 mb-3">Speech Explorer</h3>
             <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
               Filters
@@ -246,10 +247,31 @@ export default function Speeches() {
             )}
           </div>
         </div>
+      </div>
 
-        {/* Right Panel - Speech Content */}
-        <div className="flex-1 flex flex-col bg-gray-50">
-          {!selectedFilename ? (
+      {/* Right Panel - Speech Content */}
+      <div className="flex-1 flex flex-col bg-gray-50 min-w-0 relative">
+        {/* Toggle Sidebar Button */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="absolute top-4 right-4 z-10 bg-blue-600 text-white p-2 rounded-lg shadow-lg hover:bg-blue-700 transition-colors"
+          title={sidebarOpen ? 'Hide filters' : 'Show filters'}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            {sidebarOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            )}
+          </svg>
+        </button>
+
+        {!selectedFilename ? (
             <div className="flex-1 flex items-center justify-center text-gray-400">
               <div className="text-center">
                 <svg
@@ -410,7 +432,6 @@ export default function Speeches() {
               </div>
             </>
           ) : null}
-        </div>
       </div>
     </div>
   );

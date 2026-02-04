@@ -184,12 +184,12 @@ export default function MapView({ data, isLoading, onCountryClick, selectedCount
   }
 
   return (
-    <div className="h-full rounded-lg overflow-hidden">
+    <div className="h-full min-h-[500px] rounded-lg overflow-hidden">
       <MapContainer
         center={[20, 0]}
         zoom={2}
         scrollWheelZoom={true}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', minHeight: '500px' }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

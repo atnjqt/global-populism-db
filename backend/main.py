@@ -1,10 +1,10 @@
 """
 FastAPI backend for Global Populism Database visualization
 """
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 import pandas as pd
 import json
 import os
@@ -17,6 +17,23 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 app = FastAPI(title="Global Populism Database API", version="1.0.0")
+
+# IP whitelist disabled - using frontend password protection instead
+# ALLOWED_IPS = os.environ.get("ALLOWED_IPS", "100.19.143.86").split(",")
+#
+# @app.middleware("http")
+# async def ip_whitelist(request: Request, call_next):
+#     client_ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+#     if not client_ip:
+#         client_ip = request.client.host if request.client else "unknown"
+#     
+#     if client_ip not in ALLOWED_IPS:
+#         return JSONResponse(
+#             status_code=403,
+#             content={"detail": f"Access forbidden from IP: {client_ip}"}
+#         )
+#     
+#     return await call_next(request)
 
 # Enable CORS for frontend
 app.add_middleware(

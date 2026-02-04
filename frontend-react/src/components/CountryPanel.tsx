@@ -66,14 +66,14 @@ export default function CountryPanel({ country, onClose, colorByIdeology }: Coun
 
   return (
     <>
-      {/* Legend Card */}
-      <div className="bg-white rounded-lg shadow-md p-3">
+      {/* Legend Card - Horizontal on mobile, vertical on desktop */}
+      <div className="bg-white rounded-lg shadow-md p-2 sm:p-3">
         <h3 className="text-[10px] font-semibold text-gray-700 uppercase tracking-wide mb-2">
           Legend
         </h3>
         {colorByIdeology ? (
           <div className="space-y-2">
-            <div className="flex gap-2">
+            <div className="flex gap-2 justify-center sm:justify-start">
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-blue-500" />
                 <span className="text-[10px] text-gray-600">Left</span>
@@ -97,7 +97,7 @@ export default function CountryPanel({ country, onClose, colorByIdeology }: Coun
             </div>
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className="flex lg:flex-col gap-2 lg:gap-1 overflow-x-auto">
             {[
               { color: 'bg-red-800', label: '1.5-2.0' },
               { color: 'bg-red-600', label: '1.0-1.5' },
@@ -105,9 +105,9 @@ export default function CountryPanel({ country, onClose, colorByIdeology }: Coun
               { color: 'bg-yellow-400', label: '0.2-0.5' },
               { color: 'bg-green-300', label: '0.0-0.2' },
             ].map((item) => (
-              <div key={item.label} className="flex items-center gap-2">
-                <div className={`w-4 h-2.5 rounded ${item.color} border border-gray-300`} />
-                <span className="text-[10px] text-gray-600">{item.label}</span>
+              <div key={item.label} className="flex lg:flex-row flex-col items-center gap-1 lg:gap-2 min-w-fit">
+                <div className={`w-4 h-2.5 lg:w-4 lg:h-2.5 rounded ${item.color} border border-gray-300`} />
+                <span className="text-[10px] text-gray-600 whitespace-nowrap">{item.label}</span>
               </div>
             ))}
           </div>
